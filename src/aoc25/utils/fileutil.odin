@@ -18,6 +18,6 @@ parse_lines_to_arr :: proc(file: string) -> (bool, []string) {
     // Split by \r\n
     lines : []string = strings.split(file_contents, "\r\n")
 
-    fmt.println(lines)
+    defer delete(data)
     return true, lines
 }
