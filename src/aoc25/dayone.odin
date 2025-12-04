@@ -3,6 +3,7 @@ package aoc25
 import "core:fmt"
 import "core:strings"
 import "core:strconv"
+import "utils"
 
 // Where the dial starts
 start : int : 50
@@ -10,15 +11,17 @@ default : int : 0
 
 // Handles the meh stuff
 main :: proc() {
-    str: [dynamic]string
-    append(&str, "L68")
-    append(&str, "L30")
-    append(&str, "R48")
-    compute(str)
+    ok, lines := utils.parse_lines_to_arr("data/dayonecontent.txt")
+
+    if !ok {
+        fmt.println("Failed to parse file")
+    }
+
+    fmt.println("Result ", compute(lines))
 }
 
 // Processes the computations
-compute :: proc(algs : [dynamic]string) -> int {
+compute :: proc(algs : []string) -> int {
     // Will need something to calculate any sort of residual value
     dial := start
     counter := 0
@@ -38,25 +41,26 @@ compute :: proc(algs : [dynamic]string) -> int {
 process_alg :: proc(dial: int, alg: string) -> int {
     char := strings.cut(alg, 0, 1)
     num, worked := strconv.parse_int(strings.cut(alg, 1, len(alg)))
-    residual: int
+    num %= 100
+    pre_result: int
     result: int
 
     // Right ++
     // Left --
     if char == "R" {
-        residual = dial + num
+        pre_result = dial + num
     } else if char == "L" {
-        residual = dial - num
+        pre_result = dial - num
     }
 
-    if residual < 0 {
-        result = 100 - (residual * -1)
-    }
-    else if residual > 99 {
-        result = 0 + (residual % 100)
-    }
-    else {
-        result = residual
+    // If the value is greater than 99, take the pre_result and mod it by 100
+    if pre_result > 99 {
+        result = pre_result % 100
+    } else if pre_result < 0 {
+        // If pre_result is less than zero, we can simply just add the negative value to 100
+        result = 100 + pre_result
+    } else {
+        result = pre_result
     }
 
     return result
